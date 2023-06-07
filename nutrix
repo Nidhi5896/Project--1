@@ -1,0 +1,109 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+
+#define BOARD_SIZE 100
+#define WINNING_POSITION 100
+
+// Function to roll a dice
+int rollDice() {
+    return (rand() % 6) + 1;
+}
+
+// Struct to represent a food item
+typedef struct {
+    char name[20];
+    int value;
+} Food;
+
+// Function to randomly choose a healthy food item
+Food getRandomHealthyFood() {
+    Food foods[3] = {{"Apple", 2}, {"Banana", 3}, {"Salad", 4}};  // Healthy food items with their respective values
+    int index = rand() % 3;
+    return foods[index];
+}
+
+// Function to randomly choose an unhealthy food item
+Food getRandomUnhealthyFood() {
+    Food foods[3] = {{"Burger", -3}, {"Pizza", -4}, {"Soda", -2}};  // Unhealthy food items with their respective values
+    int index = rand() % 3;
+    return foods[index];
+}
+
+// Function to calculate the new position based on the current position and food value
+int calculateNewPosition(int currentPosition, int foodValue) {
+    int newPosition = currentPosition + foodValue;
+
+    // Ensure the new position is within the board bounds
+    if (newPosition < 1)
+        newPosition = 1;
+    else if (newPosition > BOARD_SIZE)
+        newPosition = BOARD_SIZE;
+
+    return newPosition;
+}
+
+// Function to display the square grid
+void displayGrid(int playerPosition) {
+    printf("Current Position: %d\n", playerPosition);
+    printf("-------------------------------------------------------------------\n");
+
+    for (int i = BOARD_SIZE; i >= 1; i--) {
+        if (i % 10 == 0)
+            printf("| ");
+
+        if (playerPosition == i)
+            printf("P ");
+        else
+            printf(". ");
+
+        if (i % 10 == 1)
+            printf("|\n");
+    }
+
+    printf("-------------------------------------------------------------------\n");
+}
+
+int main() {
+    int playerPosition = 1;
+    srand(time(0));  // Initialize random seed
+
+    printf("Food Game\n");
+    displayGrid(playerPosition);
+
+    while (1) {
+        printf("Choose your food (0 for healthy, 1 for unhealthy): ");
+        int foodType;
+        
+        scanf("%d", &foodType);
+
+        // Get a random food item based on the chosen food type
+        Food food;
+        if (foodType == 0)
+            food = getRandomHealthyFood();
+        else
+            food = getRandomUnhealthyFood();
+
+        // Display the chosen food item
+        printf("You chose %s\n", food.name);
+        if(foodType==0){
+            printf("point increase is %d \n", food.value);
+        }
+        if(foodType==1){
+            printf("point deducted is \n", food.value);
+        }
+
+        // Calculate the new position based on the food value
+        playerPosition = calculateNewPosition(playerPosition, food.value);
+
+        // Check if the player wins
+        if (playerPosition == WINNING_POSITION) {
+            printf("Congratulations! You reached the final position!\n");
+            break;
+        }
+
+        displayGrid(playerPosition);
+    }
+
+    return 0;
+}
